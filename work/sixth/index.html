@@ -15,7 +15,75 @@
   </div>
   <script src="../../common/js/jquery.js"></script>
   <script>
-    // 回答はここに書いてね
+    $(function() {
+      let initHtml =
+      `
+      <button type="button" class="btn search-btn" id="pokemon_search">ポケモンを探す</button>
+      `
+
+      let encountHtml =
+      `
+      <p class="name"></p>
+      <div>
+        <img class="img" src="" alt="">
+      </div>
+      <div>
+        <button class="btn" id="catch">捕まえる</button>
+        <button class="btn" data-js="reset">逃げる</button>
+      </div>
+      `
+
+      let doneHtml =
+      `
+      <p class="name">ゲットしました</p>
+      <div>
+        <img class="img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png" alt="">
+      </div>
+      <button class="btn" data-js="reset">戻る</button>
+      `
+
+      let failHtml =
+      `
+      <p class="text">逃げられてしまった...</p>
+      <button class="btn mt" data-js="reset">戻る</button>
+      `
+
+      function getpokemon() {
+        let pokeId = Math.floor(Math.random()*151) + 1;
+        $.ajax({
+          url: `https://pokeapi.co/api/v2/pokemon-species/${pokeId}/`,
+          method: 'GET'
+        }).done(function(res) {
+          $('.wrapper').html(encountHtml);
+          let pokename = res.names[0].name;
+          $('.name').text(pokename);
+          $('.img').attr('src', `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokeId}.png`);
+        }).fail(function(err) {
+          console.log('エラーが発生しました');
+        });
+      }
+      
+      function trycatch() {
+        if(Math.floor(Math.random()*2) === 0) {
+          $('.wrapper').html(doneHtml);
+        } else {
+          $('.wrapper').html(failHtml);
+        };
+      }
+
+      function activebtn() {
+        if ($(this).attr('id') === 'pokemon_search') {
+          getpokemon();
+        } else if ($(this).attr('id') === 'catch') {
+          trycatch();
+        } else if ($(this).data('js') === 'reset') {
+          $('.wrapper').html(initHtml);
+        };
+      }
+
+      $(document).on('click', '.btn', activebtn);
+
+    });
   </script>
 </body>
 </html>
